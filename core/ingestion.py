@@ -85,7 +85,7 @@ def ingest_github(repo_url: str) -> str:
             print(f"✅ Cloned to {clone_path}")
 
         _index_directory(clone_path)
-        return f"✅ GitHub repo ingested successfully: *{repo_name}*"
+        return f"✅ GitHub repo ingested successfully: {repo_name}"
 
     except Exception as e:
         return f"❌ GitHub ingestion failed: `{str(e)}`"
