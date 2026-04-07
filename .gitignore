@@ -1,0 +1,46 @@
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Environment Variables (NEVER push this)
+.env
+
+# Storage (personal data)
+storage/chroma_db/
+storage/uploads/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Logs
+*.log
+logs/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Distribution / Build
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
