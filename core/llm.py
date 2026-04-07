@@ -9,7 +9,7 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # Rotation — if one hits limit, falls to next
 MODELS = [
-    "openai/gpt-oss-120b",   # Best quality
+    "moonshotai/kimi-k2-instruct",   # Best quality
     "llama-3.3-70b-versatile",      # Fast fallback
     "moonshotai/kimi-k2-instruct",              # Last resort
 ]
