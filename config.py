@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 from llama_index.llms.groq import Groq
 from llama_index.core import Settings
 
-Settings.llm = Groq(api_key=os.getenv("GROQ_API_KEY"))
+Settings.llm = Groq(model="moonshotai/kimi-k2-instruct",   # Best quality
+    "llama-3.3-70b-versatile",      # Fast fallback
+    "moonshotai/kimi-k2-instruct", api_key=os.getenv("GROQ_API_KEY"))
 
 load_dotenv()
 
