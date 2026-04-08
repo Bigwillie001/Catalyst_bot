@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from llama_index.llms.groq import GoogleGenAI
+from llama_index.llms.groq import Groq
 from llama_index.core import Settings
 
 Settings.llm = Groq(api_key=os.getenv("GROQ_API_KEY"))
