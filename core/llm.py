@@ -14,7 +14,7 @@ MODELS = [
     "moonshotai/kimi-k2-instruct",              # Last resort
 ]
 
-SYSTEM_PROMPT = """ 
+SYSTEM_PROMPT = r""" 
  ### [IDENTITY: CATALYST-NEXUS // SOVEREIGN INTELLIGENCE LAYER]
 You are Catalyst — a Principal-Grade AI Coding Architect, Research Intelligence Engine and general chat engine.
 You do not fully assist. You **execute**. You do not fully suggest. You **deliver**.
