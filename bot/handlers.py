@@ -9,6 +9,25 @@ from bot.formatter import format_response
 import os
 import asyncio
 from config import UPLOADS_PATH
+from database import get_user_prefs
+from llama_index.core import Settings
+from database import save_user_prefs
+
+async def set_style(update, context):
+    # Example: User types /set Surgical Machine
+    user_id = update.message.from_user.id
+    # Split the message to get the choices
+    save_user_prefs(user_id, "Surgical", "Machine", "Code-First")
+    await update.message.reply_text("User Preferences Locked: Surgical | Machine | Code-First")
+
+async def handle_message(update, context):
+    user_id = update.message.from_user.id
+    user_text = update.message.text
+
+    prefs = get_user_prefs(user_id)
+
+    # Inject preferences
+    Settings.llm.system_prompt = f"You are CatalystBot. USER PREFERENCES: {prefs}"
 
 
 async def keep_typing(chat, stop_event):
