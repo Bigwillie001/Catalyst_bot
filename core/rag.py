@@ -1,40 +1,51 @@
+import os
+import chromadb
+from llama_index.core import VectorStoreIndex, PromptTemplate, Settings
+from llama_index.vector_stores.chroma import ChromaVectorStore
+from config import CHROMA_PATH
+
+# 1. ENFORCED STRICT TEMPLATE
+STRICT_QA_PROMPT = PromptTemplate(
+    "### [GROUND TRUTH CONTEXT]\n"
+    "---------------------\n"
+    "{context_str}\n"
+    "---------------------\n"
+    "Using ONLY the context above, answer the query.\n"
+    "If the answer is not in the context, strictly reply: "
+    "'DATA INSUFFICIENT — Query falls outside ingested parameters.'\n\n"
+    "QUERY: {query_str}\n"
+    "EXECUTION: "
+)
+
 def query_docs(query: str, top_k: int = 5) -> str:
+    """
+    RAG Synthesis Engine: Executes retrieval and synthesis using 
+    globally defined Settings (Groq + HuggingFace).
+    """
     try:
-        import chromadb
-        from llama_index.vector_stores.chroma import ChromaVectorStore
-        from llama_index.core import VectorStoreIndex, Settings
-        from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-        from llama_index.core.llms import MockLLM
-        from config import CHROMA_PATH
-
-        # Silence MockLLM warning — LlamaIndex needs something set
-        Settings.llm = MockLLM()
-        Settings.embed_model = HuggingFaceEmbedding(
-            model_name="all-MiniLM-L6-v2"
-        )
-
+        # Access Persistent Store
         client = chromadb.PersistentClient(path=CHROMA_PATH)
         collection = client.get_or_create_collection("codex_docs")
 
         count = collection.count()
         if count == 0:
-            return ""
+            return "VECTOR STORE EMPTY, Please ingest documents."
 
-        actual_k = min(top_k, count)
+        # Architecture: Chroma Vector Store -> VectorStoreIndex
         vector_store = ChromaVectorStore(chroma_collection=collection)
         index = VectorStoreIndex.from_vector_store(vector_store)
-        retriever = index.as_retriever(similarity_top_k=actual_k)
-        nodes = retriever.retrieve(query)
 
-        if not nodes:
-            return ""
+        # Build Query Engine with strict synthesis parameters
+        # Note: Settings.llm and Settings.embed_model must be set in config.py or main.py
+        query_engine = index.as_query_engine(
+            similarity_top_k=min(top_k, count),
+            response_mode="compact",        # Forces LlamaIndex to merge context and stop generic filler
+            text_qa_template=STRICT_QA_PROMPT
+        )
 
-        context_parts = []
-        for i, node in enumerate(nodes):
-            context_parts.append(f"[Source {i+1}]\n{node.text}")
-
-        return "\n\n---\n\n".join(context_parts)
+        # Execute Synthesis
+        response = query_engine.query(query)
+        return str(response)
 
     except Exception as e:
-        print(f"RAG Error: {e}")
-        return ""
+        return f"⚡ RAG ERROR: {str(e)}"

@@ -11,8 +11,13 @@ def _index_directory(path: str):
     import chromadb
 
     Settings.embed_model = HuggingFaceEmbedding(model_name="all-MiniLM-L6-v2")
-    from llama_index.core.llms import MockLLM
-    Settings.llm = MockLLM()
+    from llama_index.llms.groq import Groq
+    Settings.llm = Groq(
+        model="llama-3.3-70b-versatile",
+        api_key=os.getenv("GROQ_API_KEY"),
+        temperature=0.0,
+        max_tokens=9992
+    )
 
     # Load documents
     try:
@@ -85,7 +90,7 @@ def ingest_github(repo_url: str) -> str:
             print(f"✅ Cloned to {clone_path}")
 
         _index_directory(clone_path)
-        return f"✅ GitHub repo ingested successfully: {repo_name}"
+        return f"✅ GitHub repo ingested successfully..."
 
     except Exception as e:
         return f"❌ GitHub ingestion failed: `{str(e)}`"

@@ -8,27 +8,31 @@ from bot.handlers import handle_message, handle_document, handle_github
 from bot.commands import start_command, help_command, ingest_command, test_command
 from config import TELEGRAM_TOKEN
 
-# LlamaIndex Embedding Setup only — LLM is handled by Groq in core/llm.py
+# Global LlamaIndex Settings
 from llama_index.core import Settings
+from llama_index.llms.groq import Groq
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.core.llms import MockLLM
 
-# STEP 1 — Load environment variables
+# STEP 1 — Load environment
 load_dotenv()
-api_key = os.getenv("GROQ_API_KEY")
 
-# STEP 2 — Set embeddings globally for RAG
-Settings.embed_model = HuggingFaceEmbedding(
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
+# STEP 2 — Define THE BRAIN globally (Groq LLM)
+Settings.llm = Groq(
+    model="llama-3.3-70b-versatile",
+    api_key=os.getenv("GROQ_API_KEY"),
+    temperature=0.0,
+    max_tokens=9992
 )
 
-# STEP 3 — Silence LlamaIndex LLM requirement (Groq handles all LLM calls)
-Settings.llm = MockLLM()
+# STEP 3 — Define THE MEMORY globally (Embeddings)
+Settings.embed_model = HuggingFaceEmbedding(
+    model_name="all-MiniLM-L6-v2"
+)
 
 # STEP 4 — Silence tokenizer warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-print("✅ Embeddings initialized.")
+print("✅ Catalyst + Embeddings initialized.")
 
 def main():
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()

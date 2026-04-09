@@ -122,3 +122,29 @@ async def handle_github(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         await update.message.reply_text(f"❌ GitHub error: {str(e)}")
+
+async def send_long_message(update, context, text):
+    """Splits output into chunks to bypass Telegram's 4096 char limit."""
+    max_length = 8000
+    
+    # Split by newlines first to avoid breaking code blocks if possible
+    chunks = []
+    while len(text) > max_length:
+        split_index = text.rfind('\n', 0, max_length)
+        if split_index == -1: # No newlines found, force split
+            split_index = max_length
+        chunks.append(text[:split_index])
+        text = text[split_index:].lstrip()
+    chunks.append(text)
+
+    # Send each chunk sequentially
+    for chunk in chunks:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=chunk,
+            parse_mode='Markdown' # Or 'HTML', depending on your setup
+        )
+
+# Example usage inside your message handler:
+# response = query_engine.query(user_text)
+# await send_long_message(update, context, str(response))
