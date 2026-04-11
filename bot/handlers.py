@@ -14,6 +14,7 @@ from core.ingestion import ingest_pdf
 from bot.formatter import format_response
 from database import get_user_prefs, save_user_prefs
 from config import UPLOADS_PATH
+from tavily import TavilyClient
 
 load_dotenv()
 
