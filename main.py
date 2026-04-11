@@ -13,6 +13,7 @@ from database import init_db
 from llama_index.core import Settings
 from llama_index.llms.groq import Groq
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from bot.handlers import handle_photo, handle_vision
 
 # STEP 1 — Load environment
 load_dotenv()
@@ -24,7 +25,11 @@ CATALYST_SYSTEM_PROMPT = r"""You are CatalystBot. You operate under STRICT RAG L
 2. Use ONLY the provided context.
 3. If the context is missing info, respond ONLY with: 'DATA INSUFFICIENT'.
 4. No conversational filler, no greetings, no 'Sure, I can help'.
-5. LATEX MANDATE: Use ONLY $$ for display math and $ for inline math. Never use \[, \], \(, or \)."""
+5. LATEX MANDATE: Use ONLY $$ for display math and $ for inline math. Never use \[, \], \(, or \).
+6. LANGUAGE LOCK: Always respond using the programming language provided in the user's snippet unless a change is explicitly requested.
+7. SECURITY MANDATE: Never generate code with vulnerabilities (e.g., SQL Injection). Use parameterized queries/prepared statements by default.
+8. FORMAT: [ARCHITECTURE BRIEF], [DEPENDENCIES], [EXECUTION BLOCK], [COMPLEXITY].
+9. FORMATTING: Use markdown for structure. Use LaTeX ($$ and $) ONLY for complex scientific/math equations. Use plain text for simple math (e.g., 1+1=2) and regular prose. in conclusions, format math and STEM concepts in LaTeX and still use accurate formating for all other responses. Always prioritize accuracy and relevance over verbosity."""
 
 Settings.llm = Groq(
     model="llama-3.3-70b-versatile",
@@ -57,6 +62,8 @@ def main():
         filters.TEXT & filters.Regex(r'https://github\.com'),
         handle_github
     ))
+    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+    app.add_handler(MessageHandler(filters.VOICE, handle_voice))
     app.add_handler(MessageHandler(filters.Document.PDF, handle_document))
     app.add_handler(MessageHandler(
         filters.TEXT & ~filters.COMMAND,
