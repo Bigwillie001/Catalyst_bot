@@ -13,7 +13,7 @@ from database import init_db
 from llama_index.core import Settings
 from llama_index.llms.groq import Groq
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from bot.handlers import handle_photo, handle_vision
+from bot.handlers import handle_photo, handle_voice
 
 # STEP 1 — Load environment
 load_dotenv()
